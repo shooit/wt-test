@@ -1,21 +1,14 @@
 package shooit.datamodel
 
-import java.net.URI
-
 import scalikejdbc._
 
 
 trait Asset {
   def name: String
-  def uri: URI
-  def uriPrefix: String
+  def id: String
 }
 
-case class User(id: String, name: String, notes: Option[String] = None) extends Asset {
-  val uriPrefix = "wt-test://users/"
-
-  val uri = new URI(uriPrefix + id)
-}
+case class User(id: String, name: String, notes: Option[String] = None) extends Asset
 
 object User extends SQLSyntaxSupport[User] {
 
@@ -25,7 +18,7 @@ object User extends SQLSyntaxSupport[User] {
   /**
     * Build a user from a ResultSet
     */
-  def apply(rs: WrappedResultSet) = {
+  def apply(rs: WrappedResultSet): User = {
     val notes = rs.string("notes") match {
       case "" => None
       case s: String  => Option(s)
@@ -49,7 +42,8 @@ object User extends SQLSyntaxSupport[User] {
   /**
     * Insert a user
     */
-  def insertUser(u: User, ignoreDuplicate: Boolean = true)(implicit session: DBSession = AutoSession) = {
+  def insertUser(u: User, ignoreDuplicate: Boolean = true)
+                (implicit session: DBSession = AutoSession): Int = {
    if (ignoreDuplicate) {
      sql"""
           INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
@@ -64,7 +58,8 @@ object User extends SQLSyntaxSupport[User] {
   /**
     * Insert multiple users as a batch update
     */
-  def insertUsers(users: Seq[User], ignoreDuplicates: Boolean = true)(implicit session: DBSession = AutoSession): IndexedSeq[Int] = {
+  def insertUsers(users: Seq[User], ignoreDuplicates: Boolean = true)
+                 (implicit session: DBSession = AutoSession): IndexedSeq[Int] = {
     if (ignoreDuplicates) {
       sql"""
           INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
@@ -90,9 +85,10 @@ object User extends SQLSyntaxSupport[User] {
   }
 
   /**
-    * Selects a single user by URI
+    * Selects a single user by id
     */
-  def findById(id: String)(implicit session: DBSession = AutoSession): Option[User] = {
+  def findById(id: String)
+              (implicit session: DBSession = AutoSession): Option[User] = {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE id = $id
@@ -104,7 +100,8 @@ object User extends SQLSyntaxSupport[User] {
   /**
     * Selects user by name
     */
-  def findByName(name: String)(implicit session: DBSession = AutoSession): List[User] = {
+  def findByName(name: String)
+                (implicit session: DBSession = AutoSession): List[User] = {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE name = $name
@@ -115,9 +112,10 @@ object User extends SQLSyntaxSupport[User] {
 
   //Updating functions
   /**
-    * Adds notes to a user by URI
+    * Adds notes to a user by id
     */
-  def addNotes(id: String, notes: String)(implicit session: DBSession = AutoSession) = {
+  def addNotes(id: String, notes: String)
+              (implicit session: DBSession = AutoSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
           UPDATE users SET notes = $notes WHERE id = $id
@@ -128,9 +126,10 @@ object User extends SQLSyntaxSupport[User] {
 
   //Deleting functions
   /**
-    * Deletes a user by URI
+    * Deletes a user by id
     */
-  def deleteUser(id: String)(implicit session: DBSession = AutoSession) = {
+  def deleteUser(id: String)
+                (implicit session: DBSession = AutoSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
           DELETE FROM users WHERE id = $id
