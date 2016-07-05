@@ -7,16 +7,26 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy] {
 
   override val tableName = "taxonomies"
 
-  //  def apply(rs: WrappedResultSet)
-
   def createTable(implicit session: DBSession = AutoSession): Boolean = {
     DB localTx { implicit session =>
       sql"""
-          CREATE TABLE taxonomies (id VARCHAR, name VARCHAR, notes VARCHAR, PRIMARY KEY(id))
+        CREATE TABLE taxonomies (
+          id VARCHAR,
+          name VARCHAR,
+          notes VARCHAR,
+          parent VARCHAR,
+          FOREIGN KEY (parent) REFERENCES taxonomies(id),
+          PRIMARY KEY(id)
+        )
       """.execute.apply()
     }
   }
 
+
+  //Selecting functions
+  /**
+    * Finds the taxonomy by id
+    */
   def findById(id: String)
               (implicit session: DBSession = AutoSession): Option[SerializableTaxonomy] = {
     DB localTx { implicit session: DBSession =>
@@ -27,21 +37,17 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy] {
 
       results.map {
         case (name, notes) =>
-          val parent =
-            sql"""
-                SELECT parent FROM taxonomy2taxonomy WHERE child = $id
-             """.map(rs => rs.string("parent")).single.apply()
+          val parent = ChildrenTable.getParent(id)
+          val children = ChildrenTable.getChildren(id)
 
-          val children =
-            sql"""
-                SELECT child FROM taxonomy2taxonomy WHERE parent = $id
-               """.map(rs => rs.string("child")).list.apply()
-
-          SerializableTaxonomy(id, name, notes, parent, children.toSet)
+          SerializableTaxonomy(id, name, notes, parent, children)
       }
     }
   }
 
+  /**
+    * Selects a list of taxonomies by id
+    */
   def findByName(name: String)
                 (implicit session: DBSession = AutoSession): List[SerializableTaxonomy] = {
 
@@ -53,21 +59,16 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy] {
 
       results.map {
         case (id, notes) =>
-          val parent =
-            sql"""
-              SELECT parent FROM taxonomy2taxonomy WHERE child = $id
-           """.map(rs => rs.string("parent")).single.apply()
-
-          val children =
-            sql"""
-                SELECT child FROM taxonomy2taxonomy WHERE parent = $id
-               """.map(rs => rs.string("child")).list.apply()
-
-          SerializableTaxonomy(id, name, notes, parent, children.toSet)
+          val parent = ChildrenTable.getParent(id)
+          val children = ChildrenTable.getChildren(id)
+          SerializableTaxonomy(id, name, notes, parent, children)
       }
 
     }
   }
+
+
+  //Updating functions
 
   def updateNotes(id: String, notes: String)
                  (implicit session: DBSession = AutoSession): Int = {
@@ -81,30 +82,51 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy] {
   def updateParent(id: String, parent: String)
                   (implicit session: DBSession = AutoSession): Boolean = {
     DB localTx { implicit session: DBSession =>
+      findById(id) match {
+        case Some(t) =>
+
+          println("")
+          //remove it as a child from its old parent
+          val removeResponse = t.parent match {
+            case Some(p) => ChildrenTable.removeChild(p, t.id)
+            case None    => false
+          }
+
+          //update its parent to the new one
+          val updateResponse = sql"""
+              UPDATE taxonomies SET parent = $parent WHERE id = $id
+           """.update.apply()
+
+          //add it as a child to the new parent
+          val addResponse = ChildrenTable.addChild(parent, id)
+
+
+
+
+
+
+        case None => false
+      }
+
+      //change in taxonomies
+      val response1 = sql"""
+            UPDATE taxonomies SET parent = $parent WHERE id = $id
+         """.update.apply()
+
+      //add child to parent in children
+      val response2 = ChildrenTable.addChild(parent, id)
+
+      //remove the child from its old parent
+      val oldParent =
+
       val success =
         sql"""
           UPDATE taxonomy2taxonomy SET parent = $parent WHERE child = $id
         """.update.apply()
 
-      if (success == 1) addChild(parent, id) && ??? else false
+      if (success == 1) ChildrenTable.addChild(parent, id) && ChildrenTable.removeChild() else false
     }
   }
 
-  def addChild(parent: String, child: String)
-              (implicit session: DBSession = AutoSession): Boolean = {
-    DB localTx { implicit session: DBSession =>
-      sql"""
-           UPDATE taxonomy2taxonomy SET child = $child WHERE parent = $parent
-         """.update.apply() == 1
-    }
-  }
 
-  def removeChild(parent: String, child: String)
-                 (implicit session: DBSession = AutoSession): Boolean = {
-    DB localTx { implicit session: DBSession =>
-      sql"""
-        DELETE FROM taxonomy2taxonomy WHERE parent = 
-        """
-    }
-  }
 }
