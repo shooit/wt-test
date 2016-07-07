@@ -18,7 +18,7 @@ object ProductTable {
          category VARCHAR,
          price FLOAT,
          FOREIGN KEY (category) REFERENCES taxonomies(id),
-         PRIMARY KEY id
+         PRIMARY KEY (id)
        )
       """.execute.apply()
     }

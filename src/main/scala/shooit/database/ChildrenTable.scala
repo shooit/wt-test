@@ -53,7 +53,7 @@ object ChildrenTable {
     val ids = getChildrenIds(id)
 
     sql"""
-      SELECT * FROM taxonomies WHERE id IN $ids
+      SELECT * FROM taxonomies WHERE id IN ($ids)
     """.map(rs => SerializableTaxonomy(rs)).list.apply().toSet
   }
 

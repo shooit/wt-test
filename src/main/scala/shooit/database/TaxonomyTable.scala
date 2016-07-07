@@ -183,5 +183,4 @@ object TaxonomyTable {
       ChildrenTable.removeParentAndChildren(id)
     }
   }
-
 }

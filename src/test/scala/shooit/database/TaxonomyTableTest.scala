@@ -3,7 +3,6 @@ package shooit.database
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
-import scalikejdbc.ConnectionPool
 import shooit.database.Scopes._
 
 @RunWith(classOf[JUnitRunner])
@@ -39,17 +38,12 @@ class TaxonomyTableTest extends Specification {
       ChildrenTable.getChildrenIds(electronicsOffice.id).contains(homeTheater.id) mustEqual true
     }
 
-    "insertTaxonomies" in {
-      ok
+    "insertTaxonomies" in new FilledTaxonomyTablesScope {
+      TaxonomyTable.getAllTaxonomies.size mustEqual ts.size
     }
 
-    "insertTaxonomy" in {
-      ok
+    "insertTaxonomy" in new OneTaxonomyTablesScope {
+      TaxonomyTable.getAllTaxonomies.size mustEqual 1
     }
-
-    "getAllTaxonomies" in {
-      ok
-    }
-
   }
 }

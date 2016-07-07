@@ -9,9 +9,8 @@ import scalikejdbc._
 import shooit.database.{TaxonomyTable, UserTable}
 
 
-class WTServlet extends ScalatraServlet {
+class UserServlet extends ScalatraServlet {
   implicit val formats = DefaultFormats
-
 
   //Connect to the database
   val dbUrl = "jdbc:sqlite:/opt/devel/data/wt-test/wt-test.db"
@@ -21,12 +20,8 @@ class WTServlet extends ScalatraServlet {
   implicit val session = AutoSession
 
   //GET methods
+
   get("/") {
-    "Welcome to the WillowTree test project API"
-  }
-
-
-  get("/users") {
     params.get("name") match {
       case Some(name) => Serialization.write(UserTable.findByName(name))
       case None       => Serialization.write(UserTable.getAllUsers)
@@ -34,29 +29,17 @@ class WTServlet extends ScalatraServlet {
   }
 
 
-  get("/users/:id") {
+  get("/:id") {
     UserTable.findById(params("id")) match {
       case Some(user) => Serialization.write(user)
       case None       => "User not found"
     }
   }
 
-  get("/taxonomies") {
-    params.get("name") match {
-      case Some(name) => Serialization.write(TaxonomyTable.findByName(name))
-      case None       => Serialization.write(TaxonomyTable.getAllTaxonomies)
-    }
-  }
 
-  get("/taxonomies/:id") {
-    TaxonomyTable.findById(params("id")) match {
-      case Some(t) => Serialization.write(t)
-      case None    => "Taxonomy not found"
-    }
-  }
 
   //POST methods
-  post("/users") {
+  post("/") {
     val users = Serialization.read[Seq[User]](request.body)
 
     val ignore = params.get("ignore") match {
@@ -76,7 +59,7 @@ class WTServlet extends ScalatraServlet {
 
 
   //PUT methods
-  put("/users/:id") {
+  put("/:id") {
     val id = params("id")
     val notes = request.body
 
@@ -87,21 +70,8 @@ class WTServlet extends ScalatraServlet {
     }
   }
 
-  put("/taxonomies/:id") {
-    val id = params("id")
-    val notes = request.body
-
-    UserTable.addNotes(id, notes) match {
-      case 1 => s"Successfully added/changed notes for taxonomy $id!"
-      case 0 => s"Could not add/change notes for taxonomy $id!"
-      case _ => s"Unexpected behavior!"
-    }
-  }
-
-
-
   //DELETE methods
-  delete("/users/:id") {
+  delete("/:id") {
     val id = params("id")
 
     UserTable.deleteUser(id) match {
@@ -111,7 +81,7 @@ class WTServlet extends ScalatraServlet {
     }
   }
 
-  delete("/users") {
+  delete("/") {
     params.get("id") match {
       case Some(id) =>
         UserTable.deleteUser(id) match {
@@ -120,16 +90,6 @@ class WTServlet extends ScalatraServlet {
           case _ => s"Unexpected behavior!"
         }
       case None => "An id must be provided to delete user"
-    }
-  }
-
-  delete("/taxonomies/:id") {
-    val id = params("id")
-
-    TaxonomyTable.deleteTaxonomy(id) match {
-      case 1 => s"Successfully deleted taxonomy $id!"
-      case 0 => s"Could not delete taxonomy $id!"
-      case _ => s"Unexpected behavior!"
     }
   }
 
