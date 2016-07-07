@@ -1,13 +1,10 @@
 package shooit.database
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
 import scalikejdbc._
-import shooit.datamodel.{SerializableTaxonomy, SerializableTaxonomyRelationship}
+import shooit.datamodel.SerializableTaxonomy
 
-object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
-                        with LazyLogging {
 
-  override val tableName = "children"
+object ChildrenTable {
 
   def createTable()
                  (implicit session: DBSession): Boolean = {
@@ -28,7 +25,7 @@ object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
     * Gets the parent for a given taxonomy
     */
   def getParent(id: String)
-               (implicit session: DBSession = AutoSession): Option[String] = {
+               (implicit session: DBSession): Option[String] = {
     DB localTx { implicit session: DBSession =>
       sql"""
         SELECT parent FROM children WHERE child = $id
@@ -40,7 +37,7 @@ object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
     * Gets the children of a taxonomy
     */
   def getChildrenIds(id: String)
-                 (implicit session: DBSession = AutoSession): Set[String] = {
+                 (implicit session: DBSession): Set[String] = {
     DB localTx { implicit session: DBSession =>
       sql"""
         SELECT child FROM children WHERE parent = $id
@@ -48,8 +45,11 @@ object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
     }
   }
 
+  /**
+    * Gets the children for a parent id
+    */
   def getChildren(id: String)
-                 (implicit session: DBSession = AutoSession): Set[SerializableTaxonomy] = {
+                 (implicit session: DBSession): Set[SerializableTaxonomy] = {
     val ids = getChildrenIds(id)
 
     sql"""
@@ -61,21 +61,35 @@ object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
   /**
     * Adds a child to a parent
     */
-  def addChild(parent: String, child: String)
-              (implicit session: DBSession = AutoSession): Boolean = {
+  def insertChild(parent: String, child: String, ignoreDuplicates: Boolean = true)
+                 (implicit session: DBSession): Int = {
     DB localTx { implicit session: DBSession =>
-      sql"""
-        INSERT INTO children ( parent, child ) VALUES ( $parent, $child )
-      """.update.apply() match {
-        case 0 =>
-          logger.warn(s"No rows inserted for parent child pair ($parent, $child)")
-          false
-        case 1 =>
-          logger.info(s"Successfully inserted a parent child pair ($parent, $child)")
-          true
-        case _ =>
-          logger.error(s"Multiple rows insert for parent child pair ($parent, $child)")
-          false
+      if (ignoreDuplicates) {
+        sql"""
+          INSERT OR IGNORE INTO children ( parent, child ) VALUES ( $parent, $child )
+        """.update.apply()
+      } else {
+        sql"""
+          INSERT INTO children ( parent, child ) VALUES ( $parent, $child )
+        """.update.apply()
+      }
+    }
+  }
+
+  /**
+    * Inserts parent child pairs into the table
+    */
+  def insertChildren(pairs: Seq[(String, String)], ignoreDuplicates: Boolean = true)
+                    (implicit session: DBSession): Seq[Int] = {
+    DB autoCommit { implicit session =>
+      if (ignoreDuplicates) {
+        sql"""
+          INSERT OR IGNORE INTO children ( parent, child ) VALUES ( ?, ? )
+        """.batch(pairs.map(p => Seq[Any](p._1, p._2)): _*).apply()
+      } else {
+        sql"""
+          INSERT INTO children ( parent, child ) VALUES ( ?, ? )
+        """.batch(pairs.map(p => Seq[Any](p._1, p._2)): _*).apply()
       }
     }
   }
@@ -84,26 +98,19 @@ object ChildrenTable extends SQLSyntaxSupport[SerializableTaxonomyRelationship]
     * Removes a child from a parent
     */
   def removeChild(parent: String, child: String)
-                 (implicit session: DBSession = AutoSession): Boolean = {
+                 (implicit session: DBSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
         DELETE FROM children WHERE parent = $parent AND child = $child
-      """.update.apply() match {
-        case 0 =>
-          logger.warn(s"No rows removed for parent child pair ($parent, $child)")
-          false
-        case 1 =>
-          logger.info(s"Successfully removed a parent child pair ($parent, $child)")
-          true
-        case _ =>
-          logger.error(s"Multiple rows removed for parent child pair ($parent, $child)")
-          false
-      }
+      """.update.apply()
     }
   }
 
+  /**
+    * Removes the parent and all its children from the table
+    */
   def removeParentAndChildren(parent: String)
-                             (implicit session: DBSession = AutoSession): Int = {
+                             (implicit session: DBSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
         DELETE FROM children WHERE parent = $parent

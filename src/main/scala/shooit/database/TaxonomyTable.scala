@@ -1,17 +1,13 @@
 package shooit.database
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
 import scalikejdbc._
 import shooit.datamodel.SerializableTaxonomy
 
-object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy]
-                        with LazyLogging {
-
-  override val tableName = "taxonomies"
+object TaxonomyTable {
 
   def createTable()
-                 (implicit session: DBSession = AutoSession): Boolean = {
-    DB localTx { implicit session =>
+                 (implicit session: DBSession): Boolean = {
+    DB autoCommit { implicit session =>
       sql"""
         CREATE TABLE taxonomies (
           id VARCHAR,
@@ -28,20 +24,22 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy]
 
   //Selecting functions
   /**
-    * Finds the taxonomy by id
+    * Selects all taxonomies
     */
-  def getAllTaxonomies(implicit session: DBSession = AutoSession): List[SerializableTaxonomy] = {
-    DB localTx { implicit session: DBSession =>
+  def getAllTaxonomies(implicit session: DBSession): List[SerializableTaxonomy] = {
+    DB autoCommit { implicit session: DBSession =>
       sql"""
         SELECT * FROM taxonomies
       """.map(rs => SerializableTaxonomy(rs)).list.apply()
     }
   }
 
-
+  /**
+    * Selects a taxonomy by id
+    */
   def findById(id: String)
-              (implicit session: DBSession = AutoSession): Option[SerializableTaxonomy] = {
-    DB localTx { implicit session: DBSession =>
+              (implicit session: DBSession): Option[SerializableTaxonomy] = {
+    DB autoCommit { implicit session: DBSession =>
       val results =
         sql"""
             SELECT name, notes FROM taxonomies where id = $id
@@ -58,12 +56,12 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy]
   }
 
   /**
-    * Selects a list of taxonomies by id
+    * Selects a list of taxonomies by name
     */
   def findByName(name: String)
-                (implicit session: DBSession = AutoSession): List[SerializableTaxonomy] = {
+                (implicit session: DBSession): List[SerializableTaxonomy] = {
 
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       val results =
         sql"""
             SELECT id, notes FROM taxonomies where name = $name
@@ -79,19 +77,53 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy]
     }
   }
 
-
   //Inserting functions
-  def insertTaxonomy(t: SerializableTaxonomy)
-                    (implicit session: DBSession = AutoSession): Seq[Int] = {
-    DB localTx {implicit session: DBSession =>
-      sql"""
-        INSERT INTO taxonomies ( id, name, notes, parent )
-        VALUES ( ${t.id}, ${t.name}, ${t.notes}, ${t.parent.orNull} )
-      """.update.apply()
+  def insertTaxonomy(t: SerializableTaxonomy, ignoreDuplicates: Boolean = true)
+                    (implicit session: DBSession): Seq[Int] = {
+    DB autoCommit {implicit session: DBSession =>
+      val main: Int =
+        if (ignoreDuplicates) {
+          sql"""
+            INSERT OR IGNORE INTO taxonomies ( id, name, notes, parent )
+            VALUES ( ${t.id}, ${t.name}, ${t.notes}, ${t.parent.orNull} )
+          """.update.apply()
+        } else {
+          sql"""
+            INSERT INTO taxonomies ( id, name, notes, parent )
+            VALUES ( ${t.id}, ${t.name}, ${t.notes}, ${t.parent.orNull} )
+          """.update.apply()
+        }
 
-      sql"""
-        INSERT INTO children ( parent, child ) VALUES ( ?, ? )
-      """.batch(t.children.toSeq.map(c => Seq[Any](t.id, c)): _*).apply()
+      val children: Seq[Int] =
+        if (ignoreDuplicates) {
+          sql"""
+            INSERT INTO children ( parent, child ) VALUES ( ?, ? )
+          """.batch(t.children.toSeq.map(c => Seq[Any](t.id, c)): _*).apply()
+        } else {
+          sql"""
+            INSERT INTO children ( parent, child ) VALUES ( ?, ? )
+          """.batch(t.children.toSeq.map(c => Seq[Any](t.id, c)): _*).apply()
+        }
+
+      main +: children
+    }
+  }
+
+  def insertTaxonomies(ts: Seq[SerializableTaxonomy], ignoreDuplicates: Boolean = true)
+                      (implicit session: DBSession): Seq[Int] = {
+    DB autoCommit { implicit session: DBSession =>
+      val main: Seq[Int] = sql"""
+        INSERT INTO taxonomies ( id, name, notes, parent ) VALUES ( ?, ?, ?, ? )
+      """.batch(ts.map(t => Seq[Any](t.id, t.name, t.notes, t.parent)): _*).apply()
+
+      val children: Seq[Int] = ts.flatMap{
+        t =>
+          sql"""
+            INSERT INTO children ( parent, child ) VALUES ( ?, ? )
+          """.batch(t.children.toSeq.map(c => Seq[Any](t.id, c)): _*).apply()
+      }
+
+      main ++ children
     }
   }
 
@@ -99,55 +131,51 @@ object TaxonomyTable extends SQLSyntaxSupport[SerializableTaxonomy]
 
   //Updating functions
   def updateNotes(id: String, notes: String)
-                 (implicit session: DBSession = AutoSession): Int = {
-    DB localTx { implicit session: DBSession =>
+                 (implicit session: DBSession): Int = {
+    DB autoCommit { implicit session: DBSession =>
       sql"""
           UPDATE taxonomies SET notes = $notes WHERE id = $id
          """.update.apply()
     }
   }
 
+  /**
+    * Updates the parent for a given taxonomy
+    */
   def updateParent(id: String, parent: String)
-                  (implicit session: DBSession = AutoSession): Boolean = {
-    DB localTx { implicit session: DBSession =>
+                  (implicit session: DBSession): Seq[Int] = {
+    DB autoCommit { implicit session: DBSession =>
       findById(id) match {
         case Some(t) =>
           //remove it as a child from its old parent
           val removeResponse = t.parent match {
             case Some(p) => ChildrenTable.removeChild(p, t.id)
-            case None    => true
+            case None    => 0
           }
 
           //update its parent to the new one
           val updateResponse = sql"""
               UPDATE taxonomies SET parent = $parent WHERE id = $id
-           """.update.apply() match {
-            case 0 =>
-              logger.warn(s"No rows updated when setting new parent to taxonomy $id")
-              false
-            case 1 =>
-              logger.info(s"Successfully updated parent for taxonomy $id")
-              true
-            case _ =>
-              logger.error(s"Multiple rows updated when setting new parent to taxonomy $id")
-              false
-          }
+           """.update.apply()
 
           //add it as a child to the new parent
-          val addResponse = ChildrenTable.addChild(parent, id)
+          val addResponse = ChildrenTable.insertChild(parent, id, ignoreDuplicates = false)
 
-          removeResponse && updateResponse && addResponse
+          Seq(removeResponse, updateResponse, addResponse)
 
-        case None => false
+        case None => Seq()
       }
     }
   }
 
 
   //Deleting functions
+  /**
+    * Deletes a taxonomy and its values in the children table
+    */
   def deleteTaxonomy(id: String)
-                    (implicit session: DBSession = AutoSession): Int = {
-    DB localTx {implicit session: DBSession =>
+                    (implicit session: DBSession): Int = {
+    DB autoCommit {implicit session: DBSession =>
       sql"""
         DELETE FROM taxonomies WHERE id = $id
       """.update.apply()

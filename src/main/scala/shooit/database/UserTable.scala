@@ -3,10 +3,7 @@ package shooit.database
 import scalikejdbc._
 import shooit.datamodel.User
 
-object UserTable extends SQLSyntaxSupport[User] {
-
-  override val tableName = "users"
-
+object UserTable {
 
   /**
     * Build a user from a ResultSet
@@ -24,7 +21,8 @@ object UserTable extends SQLSyntaxSupport[User] {
   /**
     * Creates the users table
     */
-  def createTable(implicit session: DBSession = AutoSession): Boolean = {
+  def createTable()
+                 (implicit session: DBSession): Boolean = {
     sql"""
           CREATE TABLE users (id VARCHAR, name VARCHAR, notes VARCHAR, PRIMARY KEY(id))
        """.execute.apply
@@ -36,7 +34,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Insert a user
     */
   def insertUser(u: User, ignoreDuplicate: Boolean = true)
-                (implicit session: DBSession = AutoSession): Int = {
+                (implicit session: DBSession): Int = {
     if (ignoreDuplicate) {
       sql"""
           INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
@@ -52,7 +50,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Insert multiple users as a batch update
     */
   def insertUsers(users: Seq[User], ignoreDuplicates: Boolean = true)
-                 (implicit session: DBSession = AutoSession): IndexedSeq[Int] = {
+                 (implicit session: DBSession): IndexedSeq[Int] = {
     if (ignoreDuplicates) {
       sql"""
           INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
@@ -69,7 +67,7 @@ object UserTable extends SQLSyntaxSupport[User] {
   /**
     * Selects all the users from the table
     */
-  def getAllUsers(implicit session: DBSession = AutoSession): List[User] = {
+  def getAllUsers(implicit session: DBSession): List[User] = {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users
@@ -81,7 +79,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Selects a single user by id
     */
   def findById(id: String)
-              (implicit session: DBSession = AutoSession): Option[User] = {
+              (implicit session: DBSession): Option[User] = {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE id = $id
@@ -94,7 +92,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Selects user by name
     */
   def findByName(name: String)
-                (implicit session: DBSession = AutoSession): List[User] = {
+                (implicit session: DBSession): List[User] = {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE name = $name
@@ -108,7 +106,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Adds notes to a user by id
     */
   def addNotes(id: String, notes: String)
-              (implicit session: DBSession = AutoSession): Int = {
+              (implicit session: DBSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
           UPDATE users SET notes = $notes WHERE id = $id
@@ -122,7 +120,7 @@ object UserTable extends SQLSyntaxSupport[User] {
     * Deletes a user by id
     */
   def deleteUser(id: String)
-                (implicit session: DBSession = AutoSession): Int = {
+                (implicit session: DBSession): Int = {
     DB localTx { implicit session: DBSession =>
       sql"""
           DELETE FROM users WHERE id = $id
