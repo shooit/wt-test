@@ -3,20 +3,13 @@ package shooit.service
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization
 import org.scalatra.ScalatraServlet
-import scalikejdbc.{AutoSession, ConnectionPool}
+import scalikejdbc.DBSession
 import shooit.database.TaxonomyTable
 import shooit.datamodel.{Taxonomy, TaxonomyNode}
 
 
-class TaxonomyServlet extends ScalatraServlet {
+class TaxonomyServlet(implicit val session: DBSession) extends ScalatraServlet {
   implicit val formats = DefaultFormats + TaxonomyNode.TaxonomyNodeSerializer
-
-  //Connect to the database
-  val dbUrl = "jdbc:sqlite:/opt/devel/data/wt-test/wt-test.db"
-  Class.forName("org.sqlite.JDBC")
-  ConnectionPool.singleton(dbUrl, null, null)
-
-  implicit val session = AutoSession
 
   def notFound404(id: String) = halt(status = 404, reason = "Asset Not Found", body = s"Could not find taxonomy: $id")
   

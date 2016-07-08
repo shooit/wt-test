@@ -4,6 +4,10 @@
 
 This project is written in Scala with a SQL back end.  ScalikeJDBC is used to interface with the database. Scalatra is used to power the web service.
 
+###Build & Deploy
+From the wt-test directory `mvn clean install && mvn jetty:run`
+
+
 ###ER Diagram
 ![ER diagram](https://github.com/shooit/wt-test/blob/master/wt-test-er-diagram.png)
 
