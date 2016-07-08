@@ -5,7 +5,9 @@
 This project is written in Scala with a SQL back end.  ScalikeJDBC is used to interface with the database. Scalatra is used to power the web service.
 
 ###Build & Deploy
-From the wt-test directory `mvn clean install && mvn jetty:run`. 
+Install [Apache Maven](https://maven.apache.org/)
+
+From the wt-test directory `mvn clean package && mvn jetty:run`. 
 * As a default this will launch an in memory SQL database. 
 * If you wish to load default data run with `-DloadData`. 
 * If you wish to run from a persistent database run with `-DdbURL=jdbc:some:db:url`.
