@@ -19,19 +19,19 @@ The web service launches at [localhost:8080/wt-test/taxonomies]
 #####API
 
 1. **GET /** will return a list of all taxonomies
-    Params: 
-        1. (optional) name: filter the taxonomies by name
-    Examples: 
-        1. [localhost:8080/wt-test/taxonomies]
-        2. [localhost:8080/wt-test/taxonomies?name=Home%20Improvement]
+..*Params: 
+..1. (optional) name: filter the taxonomies by name
+..*Examples: 
+..1. [localhost:8080/wt-test/taxonomies]
+..2. [localhost:8080/wt-test/taxonomies?name=Home%20Improvement]
     
         
 2. **GET /id** will return a specific taxonomy by id
-    Params:
-        1. (optional) tree: return the taxonomies in tree form with root = id
-    Examples:
-        1. [localhost:8080/wt-test/taxonomies/1]
-        2. [localhost:8080/wt-test/taxonomies/1?tree]
+..*Params:
+..1. (optional) tree: return the taxonomies in tree form with root = id
+..*Examples:
+..1. [localhost:8080/wt-test/taxonomies/1]
+..2. [localhost:8080/wt-test/taxonomies/1?tree]
 
 3. **POST /** accepts a list of json taxonomy objects to be inserted
     Headers: "Content-Type: application/json"
