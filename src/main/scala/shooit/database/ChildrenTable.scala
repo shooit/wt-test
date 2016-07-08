@@ -51,7 +51,8 @@ object ChildrenTable {
     */
   def getAllChildrenIds(id: String)
                        (implicit session: DBSession): Set[String] = {
-    getChildrenIds(id).flatMap(getAllChildrenIds)
+    val children = getChildrenIds(id)
+    children + id ++ children.flatMap(getAllChildrenIds)
   }
 
   /**

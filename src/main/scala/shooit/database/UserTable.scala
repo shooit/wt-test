@@ -12,8 +12,8 @@ object UserTable {
   def createTable()
                  (implicit session: DBSession): Boolean = {
     sql"""
-          CREATE TABLE users (id VARCHAR, name VARCHAR, notes VARCHAR, PRIMARY KEY(id))
-       """.execute.apply
+      CREATE TABLE users (id VARCHAR, name VARCHAR, notes VARCHAR, PRIMARY KEY(id))
+    """.execute.apply
   }
 
 
@@ -25,7 +25,7 @@ object UserTable {
                 (implicit session: DBSession): Int = {
     sql"""
       INSERT INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
-     """.bind(u.id, u.name, u.notes).update.apply()
+    """.bind(u.id, u.name, u.notes).update.apply()
   }
 
   /**
@@ -44,10 +44,10 @@ object UserTable {
     * Selects all the users from the table
     */
   def getAllUsers(implicit session: DBSession): List[User] = {
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       sql"""
-          SELECT * FROM users
-       """.map(rs => User(rs)).list.apply()
+        SELECT * FROM users
+      """.map(rs => User(rs)).list.apply()
     }
   }
 
@@ -56,10 +56,10 @@ object UserTable {
     */
   def findById(id: String)
               (implicit session: DBSession): Option[User] = {
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       sql"""
-          SELECT * FROM users WHERE id = $id
-       """.map(rs => User(rs)).single.apply()
+        SELECT * FROM users WHERE id = $id
+      """.map(rs => User(rs)).single.apply()
     }
   }
 
@@ -69,10 +69,10 @@ object UserTable {
     */
   def findByName(name: String)
                 (implicit session: DBSession): List[User] = {
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       sql"""
-          SELECT * FROM users WHERE name = $name
-       """.map(rs => User(rs)).list.apply()
+        SELECT * FROM users WHERE name = $name
+      """.map(rs => User(rs)).list.apply()
     }
   }
 
@@ -83,10 +83,10 @@ object UserTable {
     */
   def addNotes(id: String, notes: String)
               (implicit session: DBSession): Int = {
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       sql"""
-          UPDATE users SET notes = $notes WHERE id = $id
-       """.update.apply()
+        UPDATE users SET notes = $notes WHERE id = $id
+      """.update.apply()
     }
   }
 
@@ -97,10 +97,10 @@ object UserTable {
     */
   def deleteUser(id: String)
                 (implicit session: DBSession): Int = {
-    DB localTx { implicit session: DBSession =>
+    DB autoCommit { implicit session: DBSession =>
       sql"""
-          DELETE FROM users WHERE id = $id
-       """.update.apply()
+        DELETE FROM users WHERE id = $id
+      """.update.apply()
     }
   }
 }

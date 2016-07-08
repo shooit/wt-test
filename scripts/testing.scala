@@ -36,7 +36,7 @@ val moviesMusicBooks = Taxonomy("3", "Movies, Music & Books", Option("1"), Set()
 val homeFurniturePatio = Taxonomy("4", "Home, Furniture & Patio", Option("1"), Set())
 val homeImprovement = Taxonomy("5", "Home Improvement", Option("1"), Set())
 
-val tvVideo = Taxonomy("6", "TV & Video", Option("2"), Set())
+val tvVideo = Taxonomy("6", "TV & Video", Option("2"), Set("9", "10", "11"))
 val cellPhones = Taxonomy("7", "Cell Phones", Option("2"), Set())
 val computers = Taxonomy("8", "Computers", Option("2"), Set())
 
@@ -48,8 +48,10 @@ val ts = Seq(allProducts, electronicsOffice, moviesMusicBooks,
   homeFurniturePatio, homeImprovement, tvVideo, cellPhones,
   computers, tvs, dvds, homeTheater)
 
+TaxonomyTable.insertTaxonomies(ts)
+
 val tv1 = Product("1", "32\" LCD TV", "LG", None, "9", 299.99)
-val tv2 = Product("2", "50\" LED 4K TV", "Sharp", Option("Best TV EVER!"), "9", 299.99)
+val tv2 = Product("2", "50\" LED 4K TV", "Sharp", Option("Best TV EVER!"), "9", 1299.99)
 val tv3 = Product("3", "13\" CRT TV", "RCA", Option("Old school"), "9", 29.99)
 
 val ps = Seq(tv1, tv2, tv3)

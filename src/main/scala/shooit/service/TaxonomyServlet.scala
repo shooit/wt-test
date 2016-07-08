@@ -54,7 +54,7 @@ class TaxonomyServlet extends ScalatraServlet {
   put("/:id") {
     params.get("parent") match {
       case Some(parent) => TaxonomyTable.updateParent(params("id"), parent)
-      case None => "No update passed"
+      case None => "No update passed. Try ?parent=###"
     }
   }
 
