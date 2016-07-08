@@ -14,7 +14,7 @@ A taxonomy is a level in the product organization tree for a retailer
 
 Each taxonomy has an id and a name, as well as an optional parent and children
 
-The web service launches at http://localhost:8080/wt-test/taxonomies
+The web service launches at <http://localhost:8080/wt-test/taxonomies>
 
 #####API
 
@@ -22,16 +22,16 @@ The web service launches at http://localhost:8080/wt-test/taxonomies
   * Params: 
     1. (optional) name: filter the taxonomies by name
   * Examples: 
-    1. http://localhost:8080/wt-test/taxonomies
-    2. http://localhost:8080/wt-test/taxonomies?name=Home%20Improvement
+    1. <http://localhost:8080/wt-test/taxonomies>
+    2. <http://localhost:8080/wt-test/taxonomies?name=Home%20Improvement>
     
         
 2. **GET /id** will return a specific taxonomy by id
   * Params:
     1. (optional) tree: return the taxonomies in tree form with root = id
   * Examples:
-    1. http://localhost:8080/wt-test/taxonomies/1
-    2. http://localhost:8080/wt-test/taxonomies/1?tree
+    1. <http://localhost:8080/wt-test/taxonomies/1>
+    2. <http://localhost:8080/wt-test/taxonomies/1?tree>
 
 3. **POST /** accepts a list of json taxonomy objects to be inserted
   * Headers: "Content-Type: application/json"
@@ -41,17 +41,17 @@ The web service launches at http://localhost:8080/wt-test/taxonomies
   * Params:
     1. parent: the id of the new parent
   * Example:
-    1. http://localhost:8080/wt-test/taxonomies/11?parent=10
-    2. http://localhost:8080/wt-test/taxonomies/11?parent=6
+    1. <http://localhost:8080/wt-test/taxonomies/11?parent=10>
+    2. <http://localhost:8080/wt-test/taxonomies/11?parent=6>
         
 5. **DELETE /id** removes the taxonomy with the given id
   * Example:
-    1. http://localhost:8080/wt-test/taxonomies/11
+    1. <http://localhost:8080/wt-test/taxonomies/11>
         
 ####Products
 Each product has an id, name, price, category (taxonomy) and an optional description
 
-The web service launches at http://localhost:8080/wt-test/products
+The web service launches at <http://localhost:8080/wt-test/products>
 
 #####API
 1. **GET /** will return a list of all products
@@ -59,13 +59,13 @@ The web service launches at http://localhost:8080/wt-test/products
     1. (optional) category: filter the products by category
     2. (optional) sub: returns the products in the category and all of its sub categories
   * Examples: 
-    1. http://localhost:8080/wt-test/products
-    2. http://localhost:8080/wt-test/products?category=6
-    3. http://localhost:8080/wt-test/products?category=1&sub
+    1. <http://localhost:8080/wt-test/products>
+    2. <http://localhost:8080/wt-test/products?category=6>
+    3. <http://localhost:8080/wt-test/products?category=1&sub>
    
 2. **GET /id** will return a specific product by id
   * Example:
-    1. http://localhost:8080/wt-test/product/1
+    1. <http://localhost:8080/wt-test/product/1>
 
 3. **POST /** accepts a list of json product objects to be inserted
   * Headers: "Content-Type: application/json"
@@ -75,12 +75,12 @@ The web service launches at http://localhost:8080/wt-test/products
   * Params:
     1. category: the new category
   * Example:
-    1. http://localhost:8080/wt-test/products/1?category=2
-    2. http://localhost:8080/wt-test/product/1?category=9
+    1. <http://localhost:8080/wt-test/products/1?category=2>
+    2. <http://localhost:8080/wt-test/product/1?category=9>
         
 5. **DELETE /id** removes the taxonomy with the given id
   * Example:
-    1. http://localhost:8080/wt-test/products/1
+    1. <http://localhost:8080/wt-test/products/1>
         
 ##Next Steps
 1. Better error/message pass back to the requester
