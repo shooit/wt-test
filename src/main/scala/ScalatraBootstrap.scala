@@ -1,4 +1,3 @@
-import java.util.Properties
 import javax.servlet.ServletContext
 
 import org.scalatra.LifeCycle
@@ -9,7 +8,9 @@ import shooit.service.{ProductServlet, TaxonomyServlet}
 class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext) {
-    val props = new Properties()
+    val props = System.getProperties
+
+    //connect to the db passed by -DdbUrl or default to in memory
     val dbUrl = props.getProperty("dbUrl", "jdbc:h2:mem:wt-test")
 
     //bring in both the drivers just in case
@@ -17,10 +18,10 @@ class ScalatraBootstrap extends LifeCycle {
     Class.forName("org.sqlite.JDBC")
 
     ConnectionPool.singleton(dbUrl, null, null)
-
     implicit val session = AutoSession
 
-    DataLoader.load()
+    //load the data if -DloadData is present
+    if (props.containsKey("loadData")) DataLoader.load()
 
     // Mount servlets.
     context.mount(new TaxonomyServlet, "/wt-test/taxonomies/*")
