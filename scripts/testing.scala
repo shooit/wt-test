@@ -1,36 +1,19 @@
-import org.json4s.DefaultFormats
-import org.json4s.native.Serialization
 import scalikejdbc._
-import shooit.database.{ChildrenTable, ProductTable, TaxonomyTable, UserTable}
-import shooit.datamodel.{Product, Taxonomy, TaxonomyNode, User}
+import shooit.database.{ChildrenTable, ProductTable, TaxonomyTable}
+import shooit.datamodel.{Product, Taxonomy}
 
-val dbUrl = "jdbc:sqlite:/opt/devel/data/wt-test/wt-test.db"
-ConnectionPool.singleton(dbUrl, "", "")
-//Class.forName("org.h2.Driver")
-//ConnectionPool.singleton("jdbc:h2:mem:hello", "user", "pass")
+val inMem: Boolean = true
+
+val dbUrl = if (inMem) "jdbc:h2:mem:wt-test" else "jdbc:sqlite:/opt/devel/data/wt-test/wt-test.db"
+Class.forName("org.h2.Driver")
+ConnectionPool.singleton(dbUrl, "user", "pass")
 implicit val session = AutoSession
-
-UserTable.createTable()
-val users = Seq(
-  User("shewitt", "Sam Hewitt", Some("applicant")),
-  User("jstern", "Jeremy Stern", Some("current employee")),
-  User("mross", "Mike Ross", Some("current employee")),
-  User("jdoe", "John Doe")
-)
-
-UserTable.insertUsers(users)
-UserTable.getAllUsers
-
-val tree = TaxonomyTable.treeById("1")
-implicit val formats = DefaultFormats + TaxonomyNode.TaxonomyNodeSerializer
-Serialization.write(tree)
-
 
 TaxonomyTable.createTable()
 ChildrenTable.createTable()
 ProductTable.createTable()
 
-val allProducts = Taxonomy("1", "All Departments", None, Set("2", "3", "4"))
+val allProducts = Taxonomy("1", "All Departments", None, Set("2", "3", "4", "5"))
 val electronicsOffice = Taxonomy("2", "Electronics And Office", Option("1"), Set("6", "7", "8"))
 val moviesMusicBooks = Taxonomy("3", "Movies, Music & Books", Option("1"), Set())
 val homeFurniturePatio = Taxonomy("4", "Home, Furniture & Patio", Option("1"), Set())
@@ -54,4 +37,12 @@ val tv1 = Product("1", "32\" LCD TV", "LG", None, "9", 299.99)
 val tv2 = Product("2", "50\" LED 4K TV", "Sharp", Option("Best TV EVER!"), "9", 1299.99)
 val tv3 = Product("3", "13\" CRT TV", "RCA", Option("Old school"), "9", 29.99)
 
-val ps = Seq(tv1, tv2, tv3)
+val movie1 = Product("4", "Star Wars: The Force Awakens", "Star Wars", None, "3", 14.99)
+val movie2 = Product("5", "Game of Thrones", "HBO", Some("Winter is coming"), "3", 29.99)
+val book1  = Product("6", "Harry Potter and the Sorcerer's Stone", "Harry Potter", Some("Yer a wizard 'arry"), "3", 9.99)
+
+val electronic = Product("7", "MacBook Pro", "Apple", Some("Why haven't I been updated in a year"), "9", 1999.99)
+
+val ps = Seq(tv1, tv2, tv3, movie1, movie2, book1, electronic)
+
+ProductTable.insertProducts(ps)

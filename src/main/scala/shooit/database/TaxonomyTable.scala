@@ -9,7 +9,7 @@ object TaxonomyTable {
                  (implicit session: DBSession): Boolean = {
     DB autoCommit { implicit session =>
       sql"""
-        CREATE TABLE taxonomies (
+        CREATE TABLE IF NOT EXISTS taxonomies (
           id VARCHAR,
           name VARCHAR,
           parent VARCHAR,

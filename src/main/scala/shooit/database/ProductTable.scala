@@ -13,7 +13,7 @@ object ProductTable {
                  (implicit session: DBSession): Boolean = {
     DB autoCommit { implicit session: DBSession  =>
       sql"""
-        CREATE TABLE products (
+        CREATE TABLE IF NOT EXISTS products (
          id VARCHAR,
          name VARCHAR,
          brand VARCHAR,
@@ -75,8 +75,8 @@ object ProductTable {
   /**
     * Get a product by id
     */
-  def getProduct(id: String)
-                (implicit session: DBSession): Option[Product] = {
+  def findById(id: String)
+              (implicit session: DBSession): Option[Product] = {
     DB autoCommit { implicit session: DBSession =>
       sql"""
         SELECT * FROM products WHERE id = $id
@@ -87,7 +87,7 @@ object ProductTable {
   /**
     * Get all products
     */
-  def getProducts(implicit session: DBSession): List[Product] = {
+  def getAllProducts(implicit session: DBSession): List[Product] = {
     DB autoCommit { implicit session: DBSession =>
       sql"""
         SELECT * FROM products

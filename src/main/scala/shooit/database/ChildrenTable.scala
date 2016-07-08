@@ -10,7 +10,7 @@ object ChildrenTable {
                  (implicit session: DBSession): Boolean = {
     DB autoCommit { implicit session: DBSession =>
       sql"""
-        CREATE TABLE children (
+        CREATE TABLE IF NOT EXISTS children (
           parent VARCHAR,
           child VARCHAR,
           FOREIGN KEY (parent) REFERENCES taxonomies(id),
