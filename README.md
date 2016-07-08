@@ -5,7 +5,7 @@
 This project is written in Scala with a SQL back end.  ScalikeJDBC is used to interface with the database. Scalatra is used to power the web service.
 
 ###ER Diagram
-[ER diagram](link)
+[ER diagram](https://github.com/shooit/wt-test/blob/master/wt-test-er-diagram.png)
 
 ###Taxonomy and Product API
 
