@@ -28,11 +28,6 @@
       <version>2.4.2</version>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.191</version>
-    </dependency>
-    <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.1.7</version>
@@ -42,6 +37,12 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.8.11.2</version>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.192</version>
+    </dependency>
+
 
     <!--Scalatra-->
     <dependency>
@@ -75,9 +76,22 @@
     <!-- Test -->
     <dependency>
       <groupId>org.specs2</groupId>
-      <artifactId>specs2-core_${scala.compat.version}</artifactId>
-      <version>2.4.16</version>
-      <scope>test</scope>
+      <artifactId>specs2-core_2.11</artifactId>
+      <version>3.8.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.specs2</groupId>
+      <artifactId>specs2-junit_2.11</artifactId>
+      <version>3.8.4</version>
+    </dependency>
+
+
+
+    <!--Logging-->
+    <dependency>
+      <groupId>com.typesafe.scala-logging</groupId>
+      <artifactId>scala-logging-slf4j_${scala.compat.version}</artifactId>
+      <version>2.1.2</version>
     </dependency>
   </dependencies>
 
