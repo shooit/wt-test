@@ -17,12 +17,6 @@ class TaxonomyTableTest extends Specification {
       TaxonomyTable.findById("11") mustEqual None
     }
 
-    "updateNotes" in new OneTaxonomyTablesScope {
-      val newNotes = "New Notes"
-      TaxonomyTable.updateNotes("0", newNotes)
-      TaxonomyTable.findById("0").get.notes mustEqual newNotes
-    }
-
     "findByName" in new OneTaxonomyTablesScope {
       TaxonomyTable.findByName(testName).size mustEqual 1
     }

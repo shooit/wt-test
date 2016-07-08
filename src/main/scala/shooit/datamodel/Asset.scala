@@ -9,4 +9,18 @@ trait Asset {
 
 case class User(id: String, name: String, notes: Option[String] = None) extends Asset
 
+object User {
 
+  /**
+    * Build a user from a ResultSet
+    */
+  def apply(rs: WrappedResultSet): User = {
+
+    //explicitly handle empty strings
+    val notes = rs.string("notes") match {
+      case "" => None
+      case s: String  => Option(s)
+    }
+    User(rs.string("id"), rs.string("name"), notes)
+  }
+}

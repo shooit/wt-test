@@ -6,7 +6,7 @@ import org.json4s.DefaultFormats
 import scalikejdbc.ConnectionPool
 import shooit.datamodel.User
 import scalikejdbc._
-import shooit.database.{TaxonomyTable, UserTable}
+import shooit.database.UserTable
 
 
 class UserServlet extends ScalatraServlet {
@@ -41,17 +41,7 @@ class UserServlet extends ScalatraServlet {
   //POST methods
   post("/") {
     val users = Serialization.read[Seq[User]](request.body)
-
-    val ignore = params.get("ignore") match {
-      case None    => false
-      case Some(s) =>
-        s match {
-          case "true" => true
-          case _      => false
-        }
-    }
-
-    val response = UserTable.insertUsers(users, ignore)
+    val response = UserTable.insertUsers(users)
 
     s"Successfully inserted ${response.size} users into the table"
   }
@@ -91,9 +81,5 @@ class UserServlet extends ScalatraServlet {
         }
       case None => "An id must be provided to delete user"
     }
-  }
-
-  delete("/") {
-    "DON'T TRY TO DELETE EVERYTHING PLEASE"
   }
 }

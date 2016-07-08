@@ -29,7 +29,7 @@ object ProductTable {
     DB autoCommit { implicit session: DBSession =>
       sql"""
         INSERT INTO products ( id, name, brand, notes, category, price )
-        VALUES ( ${p.id}, ${p.name}, ${p.brand}, ${p.notes}, ${p.category}, ${p.price} )
+        VALUES ( ${p.id}, ${p.name}, ${p.brand}, ${p.description}, ${p.category}, ${p.price} )
       """.update.apply()
     }
   }
@@ -54,6 +54,19 @@ object ProductTable {
       sql"""
         SELECT * FROM products WHERE category = $categoryId
       """.map(rs => Product(rs)).list.apply()
+    }
+  }
+
+  def getProductsInCategoryAndBelow(categoryId: String)
+                                   (implicit session: DBSession): Seq[Product] = {
+    DB autoCommit { implicit session: DBSession =>
+      val children = ChildrenTable.getChildrenIds(categoryId)
+
+
+      sql"""
+
+      """
+
     }
   }
 }

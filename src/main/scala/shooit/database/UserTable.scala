@@ -5,18 +5,6 @@ import shooit.datamodel.User
 
 object UserTable {
 
-  /**
-    * Build a user from a ResultSet
-    */
-  def apply(rs: WrappedResultSet): User = {
-    val notes = rs.string("notes") match {
-      case "" => None
-      case s: String  => Option(s)
-    }
-    new User(rs.string("id"), rs.string("name"), notes)
-  }
-
-
   //Create function
   /**
     * Creates the users table
@@ -33,33 +21,21 @@ object UserTable {
   /**
     * Insert a user
     */
-  def insertUser(u: User, ignoreDuplicate: Boolean = true)
+  def insertUser(u: User)
                 (implicit session: DBSession): Int = {
-    if (ignoreDuplicate) {
-      sql"""
-          INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
-       """.bind(u.id, u.name, u.notes).update.apply()
-    } else {
-      sql"""
-          INSERT INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
-       """.bind(u.id, u.name, u.notes).update.apply()
-    }
+    sql"""
+      INSERT INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
+     """.bind(u.id, u.name, u.notes).update.apply()
   }
 
   /**
     * Insert multiple users as a batch update
     */
-  def insertUsers(users: Seq[User], ignoreDuplicates: Boolean = true)
+  def insertUsers(users: Seq[User])
                  (implicit session: DBSession): IndexedSeq[Int] = {
-    if (ignoreDuplicates) {
-      sql"""
-          INSERT OR IGNORE INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
-       """.batch(users.map(u => Seq[Any](u.id, u.name, u.notes.getOrElse(""))): _*).apply()
-    } else {
-      sql"""
-          INSERT INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
-       """.batch(users.map(u => Seq[Any](u.id, u.name, u.notes.getOrElse(""))): _*).apply()
-    }
+    sql"""
+      INSERT INTO users ( id, name, notes ) VALUES ( ?, ?, ? )
+    """.batch(users.map(u => Seq[Any](u.id, u.name, u.notes.getOrElse(""))): _*).apply()
   }
 
 
@@ -71,7 +47,7 @@ object UserTable {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users
-       """.map(rs => UserTable(rs)).list.apply()
+       """.map(rs => User(rs)).list.apply()
     }
   }
 
@@ -83,7 +59,7 @@ object UserTable {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE id = $id
-       """.map(rs => UserTable(rs)).single.apply()
+       """.map(rs => User(rs)).single.apply()
     }
   }
 
@@ -96,7 +72,7 @@ object UserTable {
     DB localTx { implicit session: DBSession =>
       sql"""
           SELECT * FROM users WHERE name = $name
-       """.map(rs => UserTable(rs)).list.apply()
+       """.map(rs => User(rs)).list.apply()
     }
   }
 
