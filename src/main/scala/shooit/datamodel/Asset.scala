@@ -21,6 +21,23 @@ object User {
       case "" => None
       case s: String  => Option(s)
     }
-    User(rs.string("id"), rs.string("name"), notes)
+    User(rs.string("id"), rs.string("name"))
   }
 }
+
+case class Machine(id: String, name: String, notes: Seq[String] = Seq(), user: User) extends Asset
+
+object Machine {
+  def assignUser(machine: Machine, user: User): Machine = {
+    machine.copy(user = user)
+  }
+
+  def addNote(machine: Machine, note: String): Machine = {
+    machine.copy(notes = note +: machine.notes)
+  }
+
+  def addNotes(machine: Machine, notes: Seq[String]): Machine = {
+    machine.copy(notes = notes ++ machine.notes)
+  }
+}
+
