@@ -9,7 +9,7 @@ import org.json4s.JsonDSL._
 case class Taxonomy(id: String,
                     name: String,
                     parent: Option[String],
-                    children: Set[String]) extends Asset {
+                    children: Set[String]) {
   def isTopLevel = parent.isDefined
   def hasChildren = children.nonEmpty
 }

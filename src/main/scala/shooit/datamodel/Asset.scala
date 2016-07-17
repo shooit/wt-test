@@ -7,7 +7,7 @@ trait Asset {
   def id: String
 }
 
-case class User(id: String, name: String, notes: Option[String] = None) extends Asset
+case class User(id: String, name: String, notes: Seq[String] = Seq()) extends Asset
 
 object User {
 
