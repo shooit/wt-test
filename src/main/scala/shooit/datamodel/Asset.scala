@@ -5,31 +5,52 @@ import scalikejdbc.WrappedResultSet
 trait Asset {
   def name: String
   def id: String
+  def notes: Seq[String]
+}
+
+trait AssetManager[T <: Asset] {
+
+  def apply(resultSet: WrappedResultSet): T
+
+  def addNote(t: T, note: String): T
+
+  def addNotes(t: T, notes: Seq[String]): T
 }
 
 case class User(id: String, name: String, notes: Seq[String] = Seq()) extends Asset
 
-object User {
+object User extends AssetManager[User] {
 
   /**
     * Build a user from a ResultSet
     */
   def apply(rs: WrappedResultSet): User = {
-
-    //explicitly handle empty strings
-    val notes = rs.string("notes") match {
-      case "" => None
-      case s: String  => Option(s)
-    }
     User(rs.string("id"), rs.string("name"))
+  }
+
+
+  def addNote(user: User, note: String): User = {
+    user.copy(notes = note +: user.notes)
+  }
+
+  def addNotes(user: User, note: Seq[String]): User = {
+    user.copy(notes = note ++ user.notes)
   }
 }
 
-case class Machine(id: String, name: String, notes: Seq[String] = Seq(), user: User) extends Asset
+case class Machine(id: String,
+                   name: String,
+                   userId: Option[String] = None,
+                   notes: Seq[String] = Seq()) extends Asset
 
-object Machine {
-  def assignUser(machine: Machine, user: User): Machine = {
-    machine.copy(user = user)
+object Machine extends AssetManager[Machine] {
+
+  def apply(rs: WrappedResultSet): Machine = {
+    Machine(rs.string())
+  }
+
+  def assignUser(machine: Machine, user: String): Machine = {
+    machine.copy(userId = Some(user))
   }
 
   def addNote(machine: Machine, note: String): Machine = {

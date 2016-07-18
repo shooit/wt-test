@@ -1,11 +1,9 @@
 package shooit.database
 
 import scalikejdbc._
-import shooit.datamodel.{Taxonomy, User}
+import shooit.datamodel.User
 
-object UserTable extends SQLSyntaxSupport[User] {
-
-  override val tableName = "users"
+object UserTable {
 
   def createTable()
                  (implicit session: DBSession): Boolean = {
@@ -44,6 +42,7 @@ object UserTable extends SQLSyntaxSupport[User] {
       sql"""
         SELECT id, name, parent FROM users WHERE name = $name
       """.map(rs => User(rs)).list.apply()
+    }
   }
 
   def insertUser(u: User)
@@ -55,3 +54,5 @@ object UserTable extends SQLSyntaxSupport[User] {
     }
   }
 }
+
+object UserNotesTable
