@@ -1,4 +1,4 @@
-package shooit.datamodel
+package shooit.datamodel.taxonomies
 
 import scalikejdbc.WrappedResultSet
 

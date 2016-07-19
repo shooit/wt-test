@@ -1,4 +1,4 @@
-package shooit.datamodel
+package shooit.datamodel.assets
 
 import scalikejdbc.WrappedResultSet
 
@@ -8,24 +8,19 @@ trait Asset {
   def notes: Seq[String]
 }
 
-trait AssetManager[T <: Asset] {
-
-  def apply(resultSet: WrappedResultSet): T
-
-  def addNote(t: T, note: String): T
-
-  def addNotes(t: T, notes: Seq[String]): T
-}
-
 case class User(id: String, name: String, notes: Seq[String] = Seq()) extends Asset
 
-object User extends AssetManager[User] {
+object User {
 
   /**
     * Build a user from a ResultSet
     */
   def apply(rs: WrappedResultSet): User = {
     User(rs.string("id"), rs.string("name"))
+  }
+
+  def apply(rs: WrappedResultSet, notes: Seq[String]): User = {
+    User(rs.string("id"), rs.string("name"), notes = notes)
   }
 
 
@@ -40,17 +35,21 @@ object User extends AssetManager[User] {
 
 case class Machine(id: String,
                    name: String,
-                   userId: Option[String] = None,
+                   user: Option[User] = None,
                    notes: Seq[String] = Seq()) extends Asset
 
-object Machine extends AssetManager[Machine] {
+object Machine {
 
   def apply(rs: WrappedResultSet): Machine = {
-    Machine(rs.string())
+    Machine(rs.string("id"), rs.string("name"))
   }
 
-  def assignUser(machine: Machine, user: String): Machine = {
-    machine.copy(userId = Some(user))
+  def apply(rs: WrappedResultSet, notes: Seq[String]): Machine = {
+    Machine(rs.string("id"), rs.string("name"), notes = notes)
+  }
+
+  def assignUser(machine: Machine, user: User): Machine = {
+    machine.copy(user = Some(user))
   }
 
   def addNote(machine: Machine, note: String): Machine = {

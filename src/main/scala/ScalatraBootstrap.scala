@@ -2,8 +2,8 @@ import javax.servlet.ServletContext
 
 import org.scalatra.LifeCycle
 import scalikejdbc.{AutoSession, ConnectionPool}
-import shooit.app.DataLoader
-import shooit.service.{ProductServlet, TaxonomyServlet}
+import shooit.app.TaxonomyLoader
+import shooit.service.taxonomies.{ProductServlet, TaxonomyServlet}
 
 class ScalatraBootstrap extends LifeCycle {
 
@@ -21,7 +21,7 @@ class ScalatraBootstrap extends LifeCycle {
     implicit val session = AutoSession
 
     //load the data if -DloadData is present
-    if (props.containsKey("loadData")) DataLoader.load()
+    if (props.containsKey("loadData")) TaxonomyLoader.load()
 
     // Mount servlets.
     context.mount(new TaxonomyServlet, "/wt-test/taxonomies/*")

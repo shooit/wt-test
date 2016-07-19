@@ -1,6 +1,8 @@
 import scalikejdbc._
-import shooit.database.{ChildrenTable, ProductTable, TaxonomyTable}
-import shooit.datamodel.{Product, Taxonomy}
+import shooit.database.taxonomies.{ChildrenTable, ProductTable, TaxonomyTable}
+import shooit.database.{ChildrenTable, ProductTable}
+import shooit.datamodel.Taxonomy
+import shooit.datamodel.taxonomies.{Product, Taxonomy}
 
 val inMem: Boolean = true
 

@@ -1,7 +1,7 @@
-package shooit.database
+package shooit.database.taxonomies
 
 import scalikejdbc._
-import shooit.datamodel.Taxonomy
+import shooit.datamodel.taxonomies.Taxonomy
 
 
 object ChildrenTable {
