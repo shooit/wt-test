@@ -111,7 +111,7 @@ object UserNotesTable {
     DB autoCommit { implicit session =>
       sql"""
         SELECT note FROM usernotes WHERE userid = $userId ORDER BY timestamp DESC
-      """.map(rs => rs.string("notes")).list.apply()
+      """.map(rs => rs.string("note")).list.apply()
     }
   }
 }

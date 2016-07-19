@@ -23,12 +23,12 @@ class TaxonomyServlet(implicit val session: DBSession) extends BaseServlet {
       case Some(p) => 
         TaxonomyTable.treeById(id) match {
           case Some(tree) => Serialization.writePretty(tree)
-          case None       => notFound404(id)
+          case None       => notFound404(id, "taxonomy")
         }
       case None =>
         TaxonomyTable.findById(id) match {
           case Some(t) => Serialization.writePretty(t)
-          case None    => notFound404(id)
+          case None    => notFound404(id, "taxonomy")
         }
     }
   }

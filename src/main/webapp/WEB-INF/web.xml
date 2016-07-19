@@ -24,6 +24,22 @@ version="3.0">
             <param-value>development</param-value>
         </init-param>
     </servlet>
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>shooit.service.assets.UserServlet</servlet-class>
+        <init-param>
+            <param-name>org.scalatra.environment</param-name>
+            <param-value>development</param-value>
+        </init-param>
+    </servlet>
+    <servlet>
+        <servlet-name>MachineServlet</servlet-name>
+        <servlet-class>shooit.service.assets.MachineServlet</servlet-class>
+        <init-param>
+            <param-name>org.scalatra.environment</param-name>
+            <param-value>development</param-value>
+        </init-param>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>

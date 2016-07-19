@@ -1,7 +1,5 @@
 import scalikejdbc._
-import shooit.database._
 import shooit.database.assets.{MachineNotesTable, MachineTable, UserNotesTable, UserTable}
-import shooit.datamodel.Machine
 import shooit.datamodel.assets.{Machine, User}
 
 val inMem: Boolean = true

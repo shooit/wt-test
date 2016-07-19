@@ -22,7 +22,7 @@ class UserServlet(implicit val session: DBSession) extends BaseServlet {
 
     UserTable.findById(id) match {
       case Some(u) => Serialization.writePretty(u)
-      case None    => notFound404(id)
+      case None    => notFound404(id, "user")
     }
   }
 

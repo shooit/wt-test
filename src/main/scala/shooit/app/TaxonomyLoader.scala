@@ -5,7 +5,7 @@ import shooit.database.taxonomies.{ChildrenTable, ProductTable, TaxonomyTable}
 import shooit.datamodel.taxonomies.{Product, Taxonomy}
 
 object TaxonomyLoader {
-  def load()(implicit session: DBSession) = {
+  def load()(implicit session: DBSession): Unit = {
     TaxonomyTable.createTable()
     ChildrenTable.createTable()
     ProductTable.createTable()

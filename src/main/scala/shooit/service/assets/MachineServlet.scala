@@ -21,7 +21,7 @@ class MachineServlet(implicit val session: DBSession) extends BaseServlet {
 
     MachineTable.findById(id) match {
       case Some(m) => Serialization.writePretty(m)
-      case None    => notFound404(id)
+      case None    => notFound404(id, "Machine")
     }
   }
 

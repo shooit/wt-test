@@ -25,7 +25,7 @@ class ProductServlet(implicit val session: DBSession) extends BaseServlet {
 
     ProductTable.findById(id) match {
       case Some(p) => Serialization.writePretty(p)
-      case None    => notFound404(id)
+      case None    => notFound404(id, "product")
     }
   }
 

@@ -59,9 +59,11 @@ object MachineTable {
 
   def getAllMachines(implicit session: DBSession): Seq[Machine] = {
     DB autoCommit { implicit session =>
-      sql"""
-        SELECT * FROM users
-      """.map(rs => Machine(rs, MachineNotesTable.findById(rs.string("id")))).list.apply()
+      val machines =
+        sql"""
+          SELECT * FROM machines
+        """.map(rs => Machine(rs)).list.apply()
+      machines.map(m => m.copy(notes = MachineNotesTable.findById(m.id)))
     }
   }
 
@@ -134,7 +136,7 @@ object MachineNotesTable {
     DB autoCommit { implicit session =>
       sql"""
         SELECT note FROM machinenotes WHERE machineid = $machineId ORDER BY timestamp DESC
-      """.map(rs => rs.string("notes")).list.apply()
+      """.map(rs => rs.string("note")).list.apply()
     }
   }
 }
