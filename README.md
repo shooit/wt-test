@@ -10,11 +10,15 @@ From the wt-test directory `mvn clean install && mvn jetty:run`.
 * If you wish to load default data run with `-DloadData`. 
 * If you wish to run from a persistent database run with `-DdbURL=jdbc:some:db:url`.
 
+###Database Recommendation
+For this simple of a structure, a SQL data base is perfectly adequate.  If changes were happening very quickly and a user might want to search through the notes being added then a key/value or document store like ElasticSearch might become a better option.
 
-
+###Replication Strategy (not implemented)
+Asynchronous replication should work for this service.  Each network segment will maintain its own copy of the database and push its updates back to a master database in a timely fashion. Change logs should be kept so that if changes cannot be pushed back to the master they can be merged in once the network is reconnected.
 
 ###ER Diagrams
-![ER diagram](https://github.com/shooit/wt-test/blob/master/wt-test-er-diagram.png)
+![Asset ER diagram](https://github.com/shooit/wt-test/blob/master/wt-test-assets.png)
+![Taxonomy ER diagram](https://github.com/shooit/wt-test/blob/master/wt-test-er-diagram.png)
 
 
 ###Asset Management API
