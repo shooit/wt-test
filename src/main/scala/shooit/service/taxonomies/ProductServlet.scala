@@ -1,18 +1,13 @@
-package shooit.service
+package shooit.service.taxonomies
 
-import org.json4s.DefaultFormats
 import org.json4s.native.Serialization
-import org.scalatra.ScalatraServlet
 import scalikejdbc.DBSession
-import shooit.database.ProductTable
-import shooit.datamodel.Product
+import shooit.database.taxonomies.ProductTable
+import shooit.datamodel.taxonomies.Product
+import shooit.service.BaseServlet
 
 
-class ProductServlet(implicit val session: DBSession) extends ScalatraServlet {
-  implicit val formats = DefaultFormats
-
-
-  def notFound404(id: String) = halt(status = 404, reason = "Asset Not Found", body = s"Could not find taxonomy: $id")
+class ProductServlet(implicit val session: DBSession) extends BaseServlet {
 
   get("/") {
     params.get("category") match {
@@ -30,7 +25,7 @@ class ProductServlet(implicit val session: DBSession) extends ScalatraServlet {
 
     ProductTable.findById(id) match {
       case Some(p) => Serialization.writePretty(p)
-      case None    => notFound404(id)
+      case None    => notFound404(id, "product")
     }
   }
 

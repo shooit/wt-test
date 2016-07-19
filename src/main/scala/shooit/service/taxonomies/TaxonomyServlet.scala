@@ -1,18 +1,14 @@
-package shooit.service
+package shooit.service.taxonomies
 
-import org.json4s.DefaultFormats
 import org.json4s.native.Serialization
-import org.scalatra.ScalatraServlet
 import scalikejdbc.DBSession
-import shooit.database.TaxonomyTable
-import shooit.datamodel.{Taxonomy, TaxonomyNode}
+import shooit.database.taxonomies.TaxonomyTable
+import shooit.datamodel.taxonomies.Taxonomy
+import shooit.service.BaseServlet
 
 
-class TaxonomyServlet(implicit val session: DBSession) extends ScalatraServlet {
-  implicit val formats = DefaultFormats + TaxonomyNode.TaxonomyNodeSerializer
+class TaxonomyServlet(implicit val session: DBSession) extends BaseServlet {
 
-  def notFound404(id: String) = halt(status = 404, reason = "Asset Not Found", body = s"Could not find taxonomy: $id")
-  
   get("/") {
     params.get("name") match {
       case Some(name) => Serialization.writePretty(TaxonomyTable.findByName(name))
@@ -27,12 +23,12 @@ class TaxonomyServlet(implicit val session: DBSession) extends ScalatraServlet {
       case Some(p) => 
         TaxonomyTable.treeById(id) match {
           case Some(tree) => Serialization.writePretty(tree)
-          case None       => notFound404(id)
+          case None       => notFound404(id, "taxonomy")
         }
       case None =>
         TaxonomyTable.findById(id) match {
           case Some(t) => Serialization.writePretty(t)
-          case None    => notFound404(id)
+          case None    => notFound404(id, "taxonomy")
         }
     }
   }

@@ -2,6 +2,7 @@ package shooit.database
 
 import org.specs2.mutable.SpecificationWithJUnit
 import shooit.database.Scopes._
+import shooit.database.taxonomies.ChildrenTable
 
 class ChildrenTableTest extends SpecificationWithJUnit {
 

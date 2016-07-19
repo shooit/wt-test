@@ -4,7 +4,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import org.specs2.specification.Scope
 import scalikejdbc._
-import shooit.datamodel.{Product, Taxonomy}
+import shooit.database.taxonomies.{ChildrenTable, ProductTable, TaxonomyTable}
+import shooit.datamodel.taxonomies.{Product, Taxonomy}
 
 
 object Scopes {

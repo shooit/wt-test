@@ -1,7 +1,7 @@
-package shooit.database
+package shooit.database.taxonomies
 
 import scalikejdbc._
-import shooit.datamodel.Product
+import shooit.datamodel.taxonomies.Product
 
 
 object ProductTable {

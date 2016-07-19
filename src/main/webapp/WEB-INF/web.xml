@@ -10,7 +10,7 @@ version="3.0">
 
     <servlet>
         <servlet-name>TaxonomyServlet</servlet-name>
-        <servlet-class>shooit.service.TaxonomyServlet</servlet-class>
+        <servlet-class>shooit.service.taxonomies.TaxonomyServlet</servlet-class>
         <init-param>
             <param-name>org.scalatra.environment</param-name>
             <param-value>development</param-value>
@@ -18,7 +18,23 @@ version="3.0">
     </servlet>
     <servlet>
         <servlet-name>ProductServlet</servlet-name>
-        <servlet-class>shooit.service.ProductServlet</servlet-class>
+        <servlet-class>shooit.service.taxonomies.ProductServlet</servlet-class>
+        <init-param>
+            <param-name>org.scalatra.environment</param-name>
+            <param-value>development</param-value>
+        </init-param>
+    </servlet>
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>shooit.service.assets.UserServlet</servlet-class>
+        <init-param>
+            <param-name>org.scalatra.environment</param-name>
+            <param-value>development</param-value>
+        </init-param>
+    </servlet>
+    <servlet>
+        <servlet-name>MachineServlet</servlet-name>
+        <servlet-class>shooit.service.assets.MachineServlet</servlet-class>
         <init-param>
             <param-name>org.scalatra.environment</param-name>
             <param-value>development</param-value>

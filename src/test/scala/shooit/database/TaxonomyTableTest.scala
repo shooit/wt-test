@@ -4,6 +4,7 @@ import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 import shooit.database.Scopes._
+import shooit.database.taxonomies.{ChildrenTable, TaxonomyTable}
 
 @RunWith(classOf[JUnitRunner])
 class TaxonomyTableTest extends Specification {

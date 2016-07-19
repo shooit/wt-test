@@ -1,11 +1,11 @@
 package shooit.app
 
 import scalikejdbc.DBSession
-import shooit.database.{ChildrenTable, ProductTable, TaxonomyTable}
-import shooit.datamodel.{Product, Taxonomy}
+import shooit.database.taxonomies.{ChildrenTable, ProductTable, TaxonomyTable}
+import shooit.datamodel.taxonomies.{Product, Taxonomy}
 
-object DataLoader {
-  def load()(implicit session: DBSession) = {
+object TaxonomyLoader {
+  def load()(implicit session: DBSession): Unit = {
     TaxonomyTable.createTable()
     ChildrenTable.createTable()
     ProductTable.createTable()

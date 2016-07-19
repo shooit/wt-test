@@ -1,7 +1,7 @@
-package shooit.database
+package shooit.database.taxonomies
 
 import scalikejdbc._
-import shooit.datamodel.{Taxonomy, TaxonomyNode}
+import shooit.datamodel.taxonomies.{Taxonomy, TaxonomyNode}
 
 object TaxonomyTable {
 
@@ -25,7 +25,7 @@ object TaxonomyTable {
   /**
     * Selects all taxonomies
     */
-  def getAllTaxonomies(implicit session: DBSession): List[Taxonomy] = {
+  def getAllTaxonomies(implicit session: DBSession): Seq[Taxonomy] = {
     DB autoCommit { implicit session: DBSession =>
       sql"""
         SELECT * FROM taxonomies
@@ -59,7 +59,7 @@ object TaxonomyTable {
     DB autoCommit { implicit session: DBSession =>
       val taxonomy =
         sql"""
-          SELECT id, name, parent FROM taxonomies where id = $id
+          SELECT id, name, parent FROM taxonomies WHERE id = $id
         """.map(rs => Taxonomy(rs)).single.apply()
 
       taxonomy.map(t => t.copy(children = ChildrenTable.getChildrenIds(t.id)))
@@ -75,7 +75,7 @@ object TaxonomyTable {
     DB autoCommit { implicit session: DBSession =>
       val taxonomies =
         sql"""
-          SELECT id, name, parent FROM taxonomies where name = $name
+          SELECT id, name, parent FROM taxonomies WHERE name = $name
         """.map(rs => Taxonomy(rs)).list.apply()
 
       taxonomies.map(t => t.copy(children = ChildrenTable.getChildrenIds(t.id)))

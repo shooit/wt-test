@@ -1,15 +1,15 @@
-package shooit.datamodel
+package shooit.datamodel.taxonomies
 
 import org.json4s.JsonAST.JField
+import org.json4s.JsonDSL._
 import org.json4s.{CustomSerializer, Formats, JObject, JValue}
 import scalikejdbc.WrappedResultSet
-import org.json4s.JsonDSL._
 
 
 case class Taxonomy(id: String,
                     name: String,
                     parent: Option[String],
-                    children: Set[String]) extends Asset {
+                    children: Set[String]) {
   def isTopLevel = parent.isDefined
   def hasChildren = children.nonEmpty
 }

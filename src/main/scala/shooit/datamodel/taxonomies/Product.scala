@@ -1,4 +1,4 @@
-package shooit.datamodel
+package shooit.datamodel.taxonomies
 
 import scalikejdbc.WrappedResultSet
 
@@ -8,7 +8,7 @@ case class Product(id: String,
                    brand: String,
                    description: Option[String],
                    category: String,
-                   price: Double) extends Asset
+                   price: Double)
 
 object Product {
 
